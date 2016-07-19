@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>trello2paper - print trello cards</title>
+
+        <link href='https://fonts.googleapis.com/css?family=Work+Sans:700' rel='stylesheet' type='text/css'>
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <style>
+            input, body {
+                font-family: sans-serif;
+            }
+            h1,
+            h2 {
+                font-family: 'Work Sans', sans-serif; 
+                font-size: 1.5rem;
+            }
+            .card {
+                background-color: rgba(0,0,0,0.1);
+                background-image: url("watermark.png");
+                background-position: center;
+                background-repeat: no-repeat;
+                border-radius: 10px;
+                height: 280px;
+                margin: 2em 1em;
+                padding: 0em 1em;
+                width: 500px;
+            }
+            .card { overflow: hidden; }
+            @media print
+            {    
+            .card {page-break-inside: avoid;}
+                .no-print, .no-print *
+                {
+                    display: none !important;
+                }
+            }
+            .error { color: red; }
+            input, button, select {font-size: 1em; padding: 5px; border-radius: 5px;}
+        </style>
+    </head>
+    <body>
+        <div class="no-print">
+            <h1>trello2paper</h1>
+            <p>Print out your trello cards</p>
+            <label for="developerkey">Developer key: <input id="developerkey"></label>
+            <span>If you don't have one, <a href="https://trello.com/app-key">grab your API key here</a>.</span>
+            <span id="authorizeerror" class="error"></span>
+            <hr>
+            <button id="authorize">Log in to Trello</button>
+            <hr>
+            <label for="boardslist">Board: <select disabled id="boardslist"></select></label>
+            <button disabled id="getboards">Refresh</button>
+            <hr>
+            <label for="listslist">List: <select disabled id="listslist"></select></label> 
+            <button disabled id="getlists">Refresh</button>
+            <hr>
+            <button disabled id="print">Print Cards</button>
+        </div>
+
+        <div id="cards">
+
+            <div class="card">
+                <h2>Sample card</h2>
+                <div class='desc'>Lorem ipsum donor amet sit.</div>
+            </div>
+
+        </div>
+
+        <div class="no-print">
+        <p>By Ali Craigmile (c) 2016</p>
+        </div>
+
+        <script>
+
+            function onError(e) {
+                console.log('trello2paper error');
+                console.log(e);
+                if(e.status == 401 || e.status == 400) {
+                    $('#authorize').fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+                    $('#authorizeerror').text(e.responseText);
+                } 
+                console.log(e);
+            }
+
+            function onAuthorizeClicked() {
+
+                developerkey = $('#developerkey').val();
+
+                var src = "https://api.trello.com/1/client.js?key=" + developerkey;
+                $.getScript( src, function( data, textStatus, jqxhr ) {
+                  console.log( data ); // Data returned
+                  console.log( textStatus ); // Success
+                  console.log( jqxhr.status ); // 200
+                  console.log( "Load was performed." );
+
+                  opts = {
+                    success: onAuthorized,
+                    error: onError
+                    };
+                    Trello.authorize(opts);
+
+                });
+
+                
+            }
+
+            function onAuthorized() {
+                $('#authorizeerror').text('');
+                console.log('logged in');
+                GetBoards();
+            }
+
+            function onRefreshBoardsClicked() {
+                GetBoards();
+            }
+            
+            function onBoardChanges() {
+                GetLists();
+            }
+
+            function onBoardsUpdated() {
+                $('#boardslist').prop('disabled', false);
+                $('#getboards').prop('disabled', false);
+                GetLists();
+            }
+
+            function GetBoards() {
+                id = "me";
+                error = onError;
+                params = { boards: "open"};
+                success = function(r) {
+
+                    ClearBoards();
+                    ClearLists();
+                    ClearCards();
+
+                    $.each(r.boards,function( pos, item ) {
+                        $('#boardslist').append($("<option></option>")
+                                .attr("value",item.id)
+                                .text(item.name)); 
+                    });
+
+                    onBoardsUpdated();
+
+                };
+                Trello.members.get(id, params, success, onError);
+
+            }
+
+            function ClearBoards() {
+                $('#boardslist')
+                    .find('option')
+                    .remove();
+            }
+
+
+            function ClearCards() {
+                $('#cards')
+                    .find('div')
+                    .remove()
+                    .end();
+            }
+
+            function ClearLists() {
+                $('#listslist')
+                    .find('option')
+                    .remove();
+            }
+
+            function onRefreshListsClicked() {
+                GetLists();
+            }
+
+            function GetLists() {
+            	error = onError;
+            	id = $('#boardslist option:selected').val();
+                params = { lists: "open"};
+            	success = function(r) {
+
+                    ClearLists();
+                    ClearCards();
+
+            		$.each(r.lists,function( pos, item ) {
+            			$('#listslist').append($("<option></option>")
+                                .attr("value",item.id)
+                                .text(item.name)); 
+            		});
+
+                    onListsUpdated();
+
+            	};
+            	Trello.boards.get(id, params, success, onError);
+
+            }
+
+            function onRefreshCardsClicked() {
+                GetCards();
+            }
+
+            function onCardsUpdated() {
+                $('#print').prop('disabled', false);
+            }
+
+            function onListsUpdated() {
+                $('#listslist').prop('disabled', false);
+                $('#getlists').prop('disabled', false);
+                GetCards();
+            }
+
+            function onListChanges() {
+                GetCards();
+            }
+
+            function GetCards() {
+            	error = onError;
+                id = $( "#listslist option:selected" ).val();
+            	params = { cards: "open" };
+            	success = function(r) {
+
+                    ClearCards();
+
+            		$.each(r.cards,function( pos, item ) {
+            			$('#cards').append($("<div class='card'><h2>"+item.name+"</h2><div class='desc'>"+item.desc+"</div>"));
+            		});
+
+                    onCardsUpdated();
+
+            		console.log(r);
+            	};
+            	Trello.lists.get(id, params, success, error);
+
+            }
+
+            function onPrintClicked() {
+                window.print();
+            }
+
+            $('#authorize').click(onAuthorizeClicked);
+            $('#getlists').click(onRefreshListsClicked);
+            $('#listslist').on('change', onListChanges);
+            $('#boardslist').on('change', onBoardChanges);
+            $('#getboards').click(onRefreshBoardsClicked);
+            $('#getcards').click(onRefreshCardsClicked);
+            $('#print').click(onPrintClicked);
+
+        </script>
+
+    </body>
+</html>
