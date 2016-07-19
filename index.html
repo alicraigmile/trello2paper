@@ -3,8 +3,8 @@
     <head>
         <title>trello2paper - print trello cards</title>
 
-        <link href="://fonts.googleapis.com/css?family=Work+Sans:700" rel="stylesheet" type="text/css">
-        <script src="://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Work+Sans:700" rel="stylesheet" type="text/css">
+        <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
         <style>
             input, body {
                 font-family: sans-serif;
@@ -105,9 +105,14 @@
                 
             }
 
-            function onAuthorized() {
+            function clearErrors() {
                 $('#authorizeerror').text('');
+            }
+
+            function onAuthorized() {
                 console.log('logged in');
+                preserveDeveloperKey();
+                clearErrors();
                 GetBoards();
             }
 
@@ -119,9 +124,17 @@
                 GetLists();
             }
 
+            function EnableControl(id) {
+                $('#' + id).prop('disabled', false);
+            }
+
+            function DisableControl(id) {
+                $('#' + id).prop('disabled', true);
+            }
+
             function onBoardsUpdated() {
-                $('#boardslist').prop('disabled', false);
-                $('#getboards').prop('disabled', false);
+                EnableControl('boardslist');
+                EnableControl('getboards');
                 GetLists();
             }
 
@@ -199,12 +212,12 @@
             }
 
             function onCardsUpdated() {
-                $('#print').prop('disabled', false);
+                EnableControl('print');
             }
 
             function onListsUpdated() {
-                $('#listslist').prop('disabled', false);
-                $('#getlists').prop('disabled', false);
+                EnableControl('listslist');
+                EnableControl('getlists');
                 GetCards();
             }
 
@@ -236,13 +249,42 @@
                 window.print();
             }
 
-            $('#authorize').click(onAuthorizeClicked);
-            $('#getlists').click(onRefreshListsClicked);
-            $('#listslist').on('change', onListChanges);
-            $('#boardslist').on('change', onBoardChanges);
-            $('#getboards').click(onRefreshBoardsClicked);
-            $('#getcards').click(onRefreshCardsClicked);
-            $('#print').click(onPrintClicked);
+            function getStoredDeveloperKey() {
+                var developerKey = localStorage.getItem('developerKey');
+                return developerKey;
+            }
+
+            function setStoredDeveloperKey(developerKey) {
+                localStorage.setItem('developerKey', developerKey);
+            }
+
+            function clearStoredDeveloperKey() {
+                localStorage.removeItem('developerKey');
+            }
+
+            function preserveDeveloperKey() {
+                var developerKey = $('#developerkey').val();
+                setStoredDeveloperKey(developerKey);
+            }
+            function initDeveloperKey() {
+                var developerKey = getStoredDeveloperKey();
+                if (developerKey !== null && developerKey !== undefined) {
+                    $('#developerkey').val(developerKey);
+                }
+            }
+
+            function init() {
+                $('#authorize').click(onAuthorizeClicked);
+                $('#getlists').click(onRefreshListsClicked);
+                $('#listslist').on('change', onListChanges);
+                $('#boardslist').on('change', onBoardChanges);
+                $('#getboards').click(onRefreshBoardsClicked);
+                $('#getcards').click(onRefreshCardsClicked);
+                $('#print').click(onPrintClicked);
+                initDeveloperKey();
+            }
+
+            init();
 
         </script>
 
