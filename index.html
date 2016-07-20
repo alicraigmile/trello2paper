@@ -5,6 +5,13 @@
 
         <link href="https://fonts.googleapis.com/css?family=Work+Sans:700" rel="stylesheet" type="text/css">
         <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script>
+		$(function() {
+			$.getScript( 'trello2paper.js', function( data, textStatus, jqxhr ) {
+                  console.log( "trello2paper loaded." );
+			});
+		});		
+		</script>
         <style>
             input, body {
                 font-family: sans-serif;
@@ -46,7 +53,7 @@
             <span>If you don't have one, <a href="https://trello.com/app-key">grab your API key here</a>.</span>
             <span id="authorizeerror" class="error"></span>
             <hr>
-            <button id="authorize">Log in to Trello</button>
+            <button disabled id="authorize">Log in to Trello</button>
             <hr>
             <label for="boardslist">Board: <select disabled id="boardslist"></select></label>
             <button disabled id="getboards">Refresh</button>
@@ -70,223 +77,6 @@
 					  <a href="https://github.com/alicraigmile/trello2paper"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
 				    <p>By <a href="https://github.com/alicraigmile/">Ali Craigmile</a> (c) 2016.</p>
         </div>
-
-        <script>
-
-            function onError(e) {
-                console.log('trello2paper error');
-                console.log(e);
-                if(e.status == 401 || e.status == 400) {
-                    $('#authorize').fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
-                    $('#authorizeerror').text(e.responseText);
-                } 
-                console.log(e);
-            }
-
-            function onAuthorizeClicked() {
-
-                developerkey = $('#developerkey').val();
-
-                var src = "https://api.trello.com/1/client.js?key=" + developerkey;
-                $.getScript( src, function( data, textStatus, jqxhr ) {
-                  console.log( data ); // Data returned
-                  console.log( textStatus ); // Success
-                  console.log( jqxhr.status ); // 200
-                  console.log( "Load was performed." );
-
-                  opts = {
-                    success: onAuthorized,
-                    error: onError
-                    };
-                    Trello.authorize(opts);
-
-                });
-
-                
-            }
-
-            function clearErrors() {
-                $('#authorizeerror').text('');
-            }
-
-            function onAuthorized() {
-                console.log('logged in');
-                preserveDeveloperKey();
-                clearErrors();
-                GetBoards();
-            }
-
-            function onRefreshBoardsClicked() {
-                GetBoards();
-            }
-            
-            function onBoardChanges() {
-                GetLists();
-            }
-
-            function EnableControl(id) {
-                $('#' + id).prop('disabled', false);
-            }
-
-            function DisableControl(id) {
-                $('#' + id).prop('disabled', true);
-            }
-
-            function onBoardsUpdated() {
-                EnableControl('boardslist');
-                EnableControl('getboards');
-                GetLists();
-            }
-
-            function GetBoards() {
-                id = "me";
-                error = onError;
-                params = { boards: "open"};
-                success = function(r) {
-
-                    ClearBoards();
-                    ClearLists();
-                    ClearCards();
-
-                    $.each(r.boards,function( pos, item ) {
-                        $('#boardslist').append($("<option></option>")
-                                .attr("value",item.id)
-                                .text(item.name)); 
-                    });
-
-                    onBoardsUpdated();
-
-                };
-                Trello.members.get(id, params, success, onError);
-
-            }
-
-            function ClearBoards() {
-                $('#boardslist')
-                    .find('option')
-                    .remove();
-            }
-
-
-            function ClearCards() {
-                $('#cards')
-                    .find('div')
-                    .remove()
-                    .end();
-            }
-
-            function ClearLists() {
-                $('#listslist')
-                    .find('option')
-                    .remove();
-            }
-
-            function onRefreshListsClicked() {
-                GetLists();
-            }
-
-            function GetLists() {
-            	error = onError;
-            	id = $('#boardslist option:selected').val();
-                params = { lists: "open"};
-            	success = function(r) {
-
-                    ClearLists();
-                    ClearCards();
-
-            		$.each(r.lists,function( pos, item ) {
-            			$('#listslist').append($("<option></option>")
-                                .attr("value",item.id)
-                                .text(item.name)); 
-            		});
-
-                    onListsUpdated();
-
-            	};
-            	Trello.boards.get(id, params, success, onError);
-
-            }
-
-            function onRefreshCardsClicked() {
-                GetCards();
-            }
-
-            function onCardsUpdated() {
-                EnableControl('print');
-            }
-
-            function onListsUpdated() {
-                EnableControl('listslist');
-                EnableControl('getlists');
-                GetCards();
-            }
-
-            function onListChanges() {
-                GetCards();
-            }
-
-            function GetCards() {
-            	error = onError;
-                id = $( "#listslist option:selected" ).val();
-            	params = { cards: "open" };
-            	success = function(r) {
-
-                    ClearCards();
-
-            		$.each(r.cards,function( pos, item ) {
-            			$('#cards').append($("<div class='card'><h2>"+item.name+"</h2><div class='desc'>"+item.desc+"</div>"));
-            		});
-
-                    onCardsUpdated();
-
-            		console.log(r);
-            	};
-            	Trello.lists.get(id, params, success, error);
-
-            }
-
-            function onPrintClicked() {
-                window.print();
-            }
-
-            function getStoredDeveloperKey() {
-                var developerKey = localStorage.getItem('developerKey');
-                return developerKey;
-            }
-
-            function setStoredDeveloperKey(developerKey) {
-                localStorage.setItem('developerKey', developerKey);
-            }
-
-            function clearStoredDeveloperKey() {
-                localStorage.removeItem('developerKey');
-            }
-
-            function preserveDeveloperKey() {
-                var developerKey = $('#developerkey').val();
-                setStoredDeveloperKey(developerKey);
-            }
-            function initDeveloperKey() {
-                var developerKey = getStoredDeveloperKey();
-                if (developerKey !== null && developerKey !== undefined) {
-                    $('#developerkey').val(developerKey);
-                }
-            }
-
-            function init() {
-                $('#authorize').click(onAuthorizeClicked);
-                $('#getlists').click(onRefreshListsClicked);
-                $('#listslist').on('change', onListChanges);
-                $('#boardslist').on('change', onBoardChanges);
-                $('#getboards').click(onRefreshBoardsClicked);
-                $('#getcards').click(onRefreshCardsClicked);
-                $('#print').click(onPrintClicked);
-                initDeveloperKey();
-            }
-
-            init();
-
-        </script>
 
     </body>
 </html>
