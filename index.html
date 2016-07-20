@@ -4,6 +4,7 @@
         <title>trello2paper - print trello cards</title>
 
         <link href="https://fonts.googleapis.com/css?family=Work+Sans:700" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" type="text/css" href="trello2paper.css">
         <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
 		<script>
 		$(function() {
@@ -12,38 +13,6 @@
 			});
 		});		
 		</script>
-        <style>
-            input, body {
-                font-family: sans-serif;
-            }
-            h1,
-            h2 {
-                font-family: 'Work Sans', sans-serif; 
-                font-size: 1.5rem;
-            }
-            .card {
-                background-color: rgba(0,0,0,0.1);
-                background-image: url("watermark.png");
-                background-position: center;
-                background-repeat: no-repeat;
-                border-radius: 10px;
-                height: 280px;
-                margin: 2em 1em;
-                padding: 0em 1em;
-                width: 500px;
-            }
-            .card { overflow: hidden; }
-            @media print
-            {    
-            .card {page-break-inside: avoid;}
-                .no-print, .no-print *
-                {
-                    display: none !important;
-                }
-            }
-            .error { color: red; }
-            input, button, select {font-size: 1em; padding: 5px; border-radius: 5px;}
-        </style>
     </head>
     <body>
         <div class="no-print">
