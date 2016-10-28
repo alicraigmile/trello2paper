@@ -1,0 +1,26 @@
+{
+  "name": "trello2paper",
+  "version": "1.0.2",
+  "description": "Print trello cards",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alicraigmile/trello2paper.git"
+  },
+  "keywords": [
+    "trello",
+    "productivity"
+  ],
+  "author": "Ali Craigmile <ali@craigmile.com> (http://ali.craigmile.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alicraigmile/trello2paper/issues"
+  },
+  "homepage": "https://github.com/alicraigmile/trello2paper#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}

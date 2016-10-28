@@ -33,7 +33,7 @@ function clearErrors() {
 }
 
 function onAuthorized() {
-    console.log('logged in');
+    console.log('onAuthorized: logged in');
     preserveDeveloperKey();
     clearErrors();
     GetBoards();
@@ -174,6 +174,7 @@ function onPrintClicked() {
 
 function getStoredDeveloperKey() {
     var developerKey = localStorage.getItem('developerKey');
+		debug('Developer key retreived from local storage');
     return developerKey;
 }
 
@@ -183,11 +184,13 @@ function setStoredDeveloperKey(developerKey) {
 
 function clearStoredDeveloperKey() {
     localStorage.removeItem('developerKey');
+		debug('Developer key cleared from local storage');
 }
 
 function preserveDeveloperKey() {
     var developerKey = $('#developerkey').val();
     setStoredDeveloperKey(developerKey);
+		debug('Developer key saved to local storage');
 }
 function initDeveloperKey() {
     var developerKey = getStoredDeveloperKey();
@@ -197,6 +200,7 @@ function initDeveloperKey() {
 }
 
 function init() {
+		debug('init started')
     $('#authorize').click(onAuthorizeClicked);
     $('#getlists').click(onRefreshListsClicked);
     $('#listslist').on('change', onListChanges);
@@ -205,7 +209,12 @@ function init() {
     $('#getcards').click(onRefreshCardsClicked);
     $('#print').click(onPrintClicked);
     initDeveloperKey();
-	EnableControl('authorize');
+	  EnableControl('authorize');
+		debug('init finished')
+}
+
+function debug(msg) {
+	console.log(msg);
 }
 
 init();
