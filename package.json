@@ -2,9 +2,9 @@
   "name": "trello2paper",
   "version": "1.0.2",
   "description": "Print trello cards",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/trello2paper",
+    "test": "mocha test/"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,10 @@
   },
   "homepage": "https://github.com/alicraigmile/trello2paper#readme",
   "dependencies": {
-    "express": "^4.14.0"
+    "chai": "^3.5.0",
+    "express": "^4.14.0",
+    "mocha": "^3.1.2",
+    "morgan": "^1.7.0",
+    "supertest": "^2.0.1"
   }
 }
