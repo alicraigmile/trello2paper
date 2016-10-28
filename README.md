@@ -17,7 +17,7 @@ The application can then be accessed on http://localhost:7001
 Configuration
 -------------
 
-You can change the HTTP port in config.js
+You can change the HTTP port in config.json
 
 Further reading
 ---------------
