@@ -5,8 +5,8 @@ var request = require('supertest'),
 		chai = require('chai'),
 		expect = chai.expect;
 
-describe('GET /status', function() {
-    it('the app name is displayed', function(done) {
+describe('Status', function() {
+    it('displays the app name', function(done) {
         request(app)
             .get('/status')
             .set('Accept', 'application/json')
@@ -21,7 +21,7 @@ describe('GET /status', function() {
             });
 		});
 
-    it('the version number is displayed', function(done) {
+    it('displays the app version number', function(done) {
         request(app)
             .get('/status')
             .set('Accept', 'application/json')

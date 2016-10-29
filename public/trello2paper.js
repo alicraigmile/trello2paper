@@ -30,6 +30,24 @@ function onAuthorizeClicked() {
     });              
 }
 
+function onLogoutClicked() {
+
+		DisableControl('getboards');
+		DisableControl('getlists');
+		DisableControl('boardslist');
+		DisableControl('listslist');
+		DisableControl('print');
+		ClearLists();
+		ClearBoards();
+		ClearCards();
+
+		DisableControl('logout');
+		HideControl('logout');
+		EnableControl('authorize');
+		ShowControl('authorize');
+}
+
+
 function setAuthorizedAsText(username) {
     $('#authorizedas').text('Logged in as: ' + username);
 }
@@ -44,7 +62,12 @@ function clearErrors() {
 
 function onAuthorized() {
     console.log('onAuthorized: logged in');
+
 		DisableControl('authorize');
+		HideControl('authorize');
+		EnableControl('logout');
+		ShowControl('logout');
+
     preserveDeveloperKey();
     clearErrors();
     GetBoards();
@@ -56,6 +79,14 @@ function onRefreshBoardsClicked() {
             
 function onBoardChanges() {
     GetLists();
+}
+
+function ShowControl(id) {
+    $('#' + id).show();
+}
+
+function HideControl(id) {
+    $('#' + id).hide();
 }
 
 function EnableControl(id) {
@@ -215,11 +246,8 @@ function initDeveloperKey() {
 function init() {
 		debug('init started')
 
-    ClearBoards();
-    ClearLists();
-    ClearCards();
-
     $('#authorize').click(onAuthorizeClicked);
+    $('#logout').click(onLogoutClicked);
     $('#getlists').click(onRefreshListsClicked);
     $('#listslist').on('change', onListChanges);
     $('#boardslist').on('change', onBoardChanges);
@@ -227,8 +255,13 @@ function init() {
     $('#getcards').click(onRefreshCardsClicked);
     $('#print').click(onPrintClicked);
     initDeveloperKey();
+
+	  ShowControl('authorize');
 	  EnableControl('authorize');
+	  DisableControl('logout');
+		HideControl('logout');
 		clearAuthorizedAsText();
+
 		debug('init finished')
 }
 
