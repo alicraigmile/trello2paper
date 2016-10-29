@@ -1,6 +1,6 @@
 {
   "name": "trello2paper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Print trello cards",
   "scripts": {
     "start": "node ./bin/trello2paper",
