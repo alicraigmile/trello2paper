@@ -20,6 +20,8 @@ function onAuthorizeClicked() {
         console.log( "Load was performed." );
 
         opts = {
+						type: "popup",
+						name: "trello2paper",
             success: onAuthorized,
             error: onError
         };
@@ -28,12 +30,21 @@ function onAuthorizeClicked() {
     });              
 }
 
+function setAuthorizedAsText(username) {
+    $('#authorizedas').text('Logged in as: ' + username);
+}
+
+function clearAuthorizedAsText() {
+    $('#authorizedas').text('');
+}
+
 function clearErrors() {
     $('#authorizeerror').text('');
 }
 
 function onAuthorized() {
     console.log('onAuthorized: logged in');
+		DisableControl('authorize');
     preserveDeveloperKey();
     clearErrors();
     GetBoards();
@@ -78,6 +89,8 @@ function GetBoards() {
         });
 
         onBoardsUpdated();
+
+				setAuthorizedAsText(r.fullName);
 
     };
     Trello.members.get(id, params, success, onError);
@@ -201,6 +214,11 @@ function initDeveloperKey() {
 
 function init() {
 		debug('init started')
+
+    ClearBoards();
+    ClearLists();
+    ClearCards();
+
     $('#authorize').click(onAuthorizeClicked);
     $('#getlists').click(onRefreshListsClicked);
     $('#listslist').on('change', onListChanges);
@@ -210,6 +228,7 @@ function init() {
     $('#print').click(onPrintClicked);
     initDeveloperKey();
 	  EnableControl('authorize');
+		clearAuthorizedAsText();
 		debug('init finished')
 }
 
