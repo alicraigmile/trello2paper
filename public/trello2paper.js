@@ -236,6 +236,12 @@ function preserveDeveloperKey() {
     setStoredDeveloperKey(developerKey);
 		debug('Developer key saved to local storage');
 }
+
+function onChangeColour(colour) {
+		console.log('Colour changed to ' + colour);
+		$('.card').css('background-color', colour);
+}
+
 function initDeveloperKey() {
     var developerKey = getStoredDeveloperKey();
     if (developerKey !== null && developerKey !== undefined) {
@@ -262,7 +268,28 @@ function init() {
 		HideControl('logout');
 		clearAuthorizedAsText();
 
+		$.getScript( 'spectrum.js', function( data, textStatus, jqxhr ) {
+				console.log( "spectrum loaded." );
+				initColourPicker();
+		});
+
+
 		debug('init finished')
+}
+
+function initColourPicker() {
+		console.log('using spectrum');
+	  $('#cardColour').spectrum({
+        showPaletteOnly: true,
+        showPalette:true,
+        color: 'lightgray',
+				change: onChangeColour,
+        palette: [
+            ['lightgray', 'black', 'white', 'blanchedalmond',
+            'rgb(255, 128, 0);', 'hsv 100 70 50'],
+            ['red', 'yellow', 'green', 'blue', 'violet']
+        ]
+		});
 }
 
 function debug(msg) {
