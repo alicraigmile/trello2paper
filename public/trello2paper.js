@@ -1,4 +1,5 @@
 var config = null;
+var customisations = { colour: null };
 
 function onError(e) {
     console.log('trello2paper error');
@@ -211,6 +212,7 @@ function onRefreshCardsClicked() {
 }
 
 function onCardsUpdated() {
+		ApplyCardCustomisations();
     EnableSpectrumControl('cardColour');
     EnableControl('print');
 }
@@ -258,7 +260,12 @@ function onPrintClicked() {
 
 function onChangeColour(colour) {
 		debug('Colour changed to ' + colour);
-		$('.card').css('background-color', colour);
+		customisations['colour'] = colour; // app cache
+		ApplyCardCustomisations();
+}
+
+function ApplyCardCustomisations() {
+		$('.card').css('background-color', customisations['colour']);
 }
 
 function init() {
