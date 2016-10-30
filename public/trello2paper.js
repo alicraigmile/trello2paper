@@ -1,3 +1,5 @@
+var config = null;
+
 function onError(e) {
     console.log('trello2paper error');
     console.log(e);
@@ -10,15 +12,10 @@ function onError(e) {
 
 function onAuthorizeClicked() {
 
-    developerkey = $('#developerkey').val();
+    var developerKey = config['trello-developer-key'];
 
-    var src = "https://api.trello.com/1/client.js?key=" + developerkey;
+    var src = "https://api.trello.com/1/client.js?key=" + developerKey;
     $.getScript( src, function( data, textStatus, jqxhr ) {
-        console.log( data ); // Data returned
-        console.log( textStatus ); // Success
-        console.log( jqxhr.status ); // 200
-        console.log( "Load was performed." );
-
         opts = {
 						type: "popup",
 						name: "trello2paper",
@@ -36,7 +33,9 @@ function onLogoutClicked() {
 		DisableControl('getlists');
 		DisableControl('boardslist');
 		DisableControl('listslist');
+		DisableSpectrumControl('cardColour');
 		DisableControl('print');
+
 		ClearLists();
 		ClearBoards();
 		ClearCards();
@@ -45,6 +44,7 @@ function onLogoutClicked() {
 		HideControl('logout');
 		EnableControl('authorize');
 		ShowControl('authorize');
+		clearAuthorizedAsText();
 }
 
 
@@ -61,14 +61,13 @@ function clearErrors() {
 }
 
 function onAuthorized() {
-    console.log('onAuthorized: logged in');
+    debug('onAuthorized: logged in');
 
 		DisableControl('authorize');
 		HideControl('authorize');
 		EnableControl('logout');
 		ShowControl('logout');
 
-    preserveDeveloperKey();
     clearErrors();
     GetBoards();
 }
@@ -95,6 +94,16 @@ function EnableControl(id) {
 
 function DisableControl(id) {
     $('#' + id).prop('disabled', true);
+}
+
+function EnableSpectrumControl(id) {
+		debug('enable spectrum control ' + id);
+    $('#' + id).spectrum('enable');
+}
+
+function DisableSpectrumControl(id) {
+		debug('disable spectrum control ' + id);
+    $('#' + id).spectrum('disable');
 }
 
 function onBoardsUpdated() {
@@ -179,6 +188,7 @@ function onRefreshCardsClicked() {
 }
 
 function onCardsUpdated() {
+    EnableSpectrumControl('cardColour');
     EnableControl('print');
 }
 
@@ -206,7 +216,7 @@ function GetCards() {
 
         onCardsUpdated();
 
-		console.log(r);
+		//debug(r);
 	};
 	Trello.lists.get(id, params, success, error);
 
@@ -216,37 +226,9 @@ function onPrintClicked() {
     window.print();
 }
 
-function getStoredDeveloperKey() {
-    var developerKey = localStorage.getItem('developerKey');
-		debug('Developer key retreived from local storage');
-    return developerKey;
-}
-
-function setStoredDeveloperKey(developerKey) {
-    localStorage.setItem('developerKey', developerKey);
-}
-
-function clearStoredDeveloperKey() {
-    localStorage.removeItem('developerKey');
-		debug('Developer key cleared from local storage');
-}
-
-function preserveDeveloperKey() {
-    var developerKey = $('#developerkey').val();
-    setStoredDeveloperKey(developerKey);
-		debug('Developer key saved to local storage');
-}
-
 function onChangeColour(colour) {
-		console.log('Colour changed to ' + colour);
+		debug('Colour changed to ' + colour);
 		$('.card').css('background-color', colour);
-}
-
-function initDeveloperKey() {
-    var developerKey = getStoredDeveloperKey();
-    if (developerKey !== null && developerKey !== undefined) {
-        $('#developerkey').val(developerKey);
-    }
 }
 
 function init() {
@@ -260,25 +242,34 @@ function init() {
     $('#getboards').click(onRefreshBoardsClicked);
     $('#getcards').click(onRefreshCardsClicked);
     $('#print').click(onPrintClicked);
-    initDeveloperKey();
 
-	  ShowControl('authorize');
-	  EnableControl('authorize');
-	  DisableControl('logout');
-		HideControl('logout');
-		clearAuthorizedAsText();
-
-		$.getScript( 'spectrum.js', function( data, textStatus, jqxhr ) {
-				console.log( "spectrum loaded." );
-				initColourPicker();
+		debug('loading /config');
+		$.getJSON( '/config', {}, function(data) {
+				debug('/config loaded');
+				config = data;
+				onConfigLoaded();
 		});
 
+		debug('loading spectrum.js');
+		$.getScript( 'spectrum.js', function( data, textStatus, jqxhr ) {
+				debug("spectrum.js loaded");
+				AddSpectrumToControl('cardColour');
+				DisableSpectrumControl('cardColour');
+		});
 
 		debug('init finished')
 }
 
-function initColourPicker() {
-		console.log('using spectrum');
+function onConfigLoaded() {
+		ShowControl('authorize');
+		EnableControl('authorize');
+		DisableControl('logout');
+		HideControl('logout');
+		clearAuthorizedAsText();
+}
+
+function AddSpectrumToControl(id) {
+		debug('add spectrum to control ' + id);
 	  $('#cardColour').spectrum({
         showPaletteOnly: true,
         showPalette:true,
