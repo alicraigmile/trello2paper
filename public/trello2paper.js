@@ -74,11 +74,10 @@ function onAuthorized() {
 
 function onRefreshBoardsClicked() {
 
-    ClearBoards();
+    //ClearBoards();
     //ClearLists();
     //ClearCards();
 
-    DisableControl('getboards');
     DisableControl('getlists');
     DisableControl('boardslist');
     DisableControl('listslist');
@@ -118,6 +117,10 @@ function DisableSpectrumControl(id) {
     $('#' + id).spectrum('disable');
 }
 
+function onBeforeBoardsUpdated() {
+		ClearBoards();
+}
+
 function onBoardsUpdated() {
     EnableControl('boardslist');
     EnableControl('getboards');
@@ -130,6 +133,7 @@ function GetBoards() {
     params = { boards: "open"};
     success = function(r) {
 
+				onBeforeBoardsUpdated();
 
         $.each(r.boards,function( pos, item ) {
             $('#boardslist').append($("<option></option>")
