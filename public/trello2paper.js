@@ -73,6 +73,18 @@ function onAuthorized() {
 }
 
 function onRefreshBoardsClicked() {
+
+    ClearBoards();
+    ClearLists();
+    ClearCards();
+
+    DisableControl('getboards');
+    DisableControl('getlists');
+    DisableControl('boardslist');
+    DisableControl('listslist');
+    DisableSpectrumControl('cardColour');
+    DisableControl('print');
+
     GetBoards();
 }
             
@@ -118,9 +130,6 @@ function GetBoards() {
     params = { boards: "open"};
     success = function(r) {
 
-        ClearBoards();
-        ClearLists();
-        ClearCards();
 
         $.each(r.boards,function( pos, item ) {
             $('#boardslist').append($("<option></option>")
@@ -158,6 +167,13 @@ function ClearLists() {
 }
 
 function onRefreshListsClicked() {
+    ClearLists();
+    ClearCards();
+
+    DisableControl('listslist');
+    DisableSpectrumControl('cardColour');
+    DisableControl('print');
+
     GetLists();
 }
 
@@ -166,9 +182,6 @@ function GetLists() {
 	id = $('#boardslist option:selected').val();
     params = { lists: "open"};
 	success = function(r) {
-
-        ClearLists();
-        ClearCards();
 
 		$.each(r.lists,function( pos, item ) {
 			$('#listslist').append($("<option></option>")
