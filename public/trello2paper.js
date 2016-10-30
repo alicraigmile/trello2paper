@@ -1,4 +1,5 @@
 var config = null;
+var customisations = { colour: null };
 
 function onError(e) {
     console.log('trello2paper error');
@@ -74,11 +75,10 @@ function onAuthorized() {
 
 function onRefreshBoardsClicked() {
 
-    ClearBoards();
-    ClearLists();
-    ClearCards();
+    //ClearBoards();
+    //ClearLists();
+    //ClearCards();
 
-    DisableControl('getboards');
     DisableControl('getlists');
     DisableControl('boardslist');
     DisableControl('listslist');
@@ -118,6 +118,10 @@ function DisableSpectrumControl(id) {
     $('#' + id).spectrum('disable');
 }
 
+function onBeforeBoardsUpdated() {
+		ClearBoards();
+}
+
 function onBoardsUpdated() {
     EnableControl('boardslist');
     EnableControl('getboards');
@@ -130,6 +134,7 @@ function GetBoards() {
     params = { boards: "open"};
     success = function(r) {
 
+				onBeforeBoardsUpdated();
 
         $.each(r.boards,function( pos, item ) {
             $('#boardslist').append($("<option></option>")
@@ -167,7 +172,7 @@ function ClearLists() {
 }
 
 function onRefreshListsClicked() {
-    ClearLists();
+    //ClearLists();
     ClearCards();
 
     DisableControl('listslist');
@@ -183,6 +188,8 @@ function GetLists() {
     params = { lists: "open"};
 	success = function(r) {
 
+				onBeforeListsUpdated();
+
 		$.each(r.lists,function( pos, item ) {
 			$('#listslist').append($("<option></option>")
                     .attr("value",item.id)
@@ -196,13 +203,23 @@ function GetLists() {
 
 }
 
+function onBeforeCardsUpdated() {
+		ClearCards();
+}
+
 function onRefreshCardsClicked() {
     GetCards();
 }
 
 function onCardsUpdated() {
+		ApplyCardCustomisations();
     EnableSpectrumControl('cardColour');
     EnableControl('print');
+}
+
+function onBeforeListsUpdated() {
+		ClearLists();
+		ClearCards();
 }
 
 function onListsUpdated() {
@@ -212,6 +229,8 @@ function onListsUpdated() {
 }
 
 function onListChanges() {
+    DisableSpectrumControl('cardColour');
+    DisableControl('print');
     GetCards();
 }
 
@@ -221,7 +240,7 @@ function GetCards() {
 	params = { cards: "open" };
 	success = function(r) {
 
-        ClearCards();
+				onBeforeCardsUpdated();
 
 		$.each(r.cards,function( pos, item ) {
 			$('#cards').append($("<div class='card'><h2>"+item.name+"</h2><div class='desc'>"+item.desc+"</div>"));
@@ -241,7 +260,12 @@ function onPrintClicked() {
 
 function onChangeColour(colour) {
 		debug('Colour changed to ' + colour);
-		$('.card').css('background-color', colour);
+		customisations['colour'] = colour; // app cache
+		ApplyCardCustomisations();
+}
+
+function ApplyCardCustomisations() {
+		$('.card').css('background-color', customisations['colour']);
 }
 
 function init() {
