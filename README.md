@@ -17,7 +17,8 @@ The application can then be accessed on http://localhost:7001
 Configuration
 -------------
 
-You can change the HTTP port in config.json
+* To make trello2paper work for you, you'll need a API Key from Trello. Get yours from https://trello.com/app-key and add it to config.json.
+* You can change the HTTP port in config.json.
 
 Further reading
 ---------------

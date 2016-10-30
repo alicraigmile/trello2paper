@@ -10,7 +10,7 @@
 		<script>
 		$(function() {
 			$.getScript( 'trello2paper.js', function( data, textStatus, jqxhr ) {
-                  console.log( "trello2paper loaded." );
+                  console.log( "trello2paper loaded" );
 			});
 		});		
 		</script>
@@ -19,8 +19,6 @@
         <div class="no-print">
             <h1>trello2paper</h1>
             <p>Print out your trello cards</p>
-            <label for="developerkey">Developer key: <input id="developerkey"></label>
-            <span>If you don't have one, <a href="https://trello.com/app-key">grab your API key here</a>.</span>
             <span id="authorizeerror" class="error"></span>
             <hr>
             <button disabled id="authorize">Authorise</button>
