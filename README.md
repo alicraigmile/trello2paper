@@ -28,11 +28,15 @@ cd trello2paper
 
 ### To run integration tests
 
+```
 ./ci.sh
+```
 
 ### To run the application
 
+```
 npm install
 ./bin/trello2paper
+```
 
 The application can then be accessed on http://localhost:7001
