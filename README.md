@@ -16,8 +16,10 @@ To set it up for youself, you will need:
 
 ### Installation
 
+```
 git clone git@github.com:alicraigmile/trello2paper.git
 cd trello2paper
+```
 
 ### Configuration
 
