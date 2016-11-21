@@ -40,3 +40,11 @@ npm install
 ```
 
 The application can then be accessed on http://localhost:7001
+
+### Libraries
+
+trello2paper relies on a couple of JS libraries:
+
+* jquery (1.7.1)
+* https://github.com/evilstreak/markdown-js (0.6.0-beta1)
+* https://github.com/bgrins/spectrum
