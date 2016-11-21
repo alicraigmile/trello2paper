@@ -243,7 +243,8 @@ function GetCards() {
 				onBeforeCardsUpdated();
 
 		$.each(r.cards,function( pos, item ) {
-			$('#cards').append($("<div class='card'><h2>"+item.name+"</h2><div class='desc'>"+item.desc+"</div>"));
+			var desc = markdown.toHTML(item.desc); 
+			$('#cards').append($("<div class='card'><h2>"+item.name+"</h2><div class='desc'>"+desc+"</div>"));
 		});
 
         onCardsUpdated();
